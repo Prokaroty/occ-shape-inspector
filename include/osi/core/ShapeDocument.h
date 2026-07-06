@@ -2,6 +2,7 @@
 
 #include "osi/core/ShapeStatistics.h"
 
+#include <memory>
 #include <string>
 
 namespace osi::core {
@@ -89,12 +90,42 @@ public:
      */
     void setStatistics(ShapeStatistics statistics);
 
+    /**
+     * @brief Returns true when a native geometry handle is attached.
+     */
+    bool hasNativeShape() const;
+
+    /**
+     * @brief Returns the native shape type identifier, for example "TopoDS_Shape".
+     */
+    const std::string& nativeShapeType() const;
+
+    /**
+     * @brief Returns an opaque native shape handle.
+     *
+     * The handle is intentionally type-erased so core does not expose OCCT headers.
+     * OCCT-aware modules may cast it after checking nativeShapeType().
+     */
+    std::shared_ptr<const void> nativeShape() const;
+
+    /**
+     * @brief Attaches an opaque native shape handle.
+     */
+    void setNativeShape(std::shared_ptr<void> nativeShape, std::string nativeShapeType);
+
+    /**
+     * @brief Clears any attached native shape handle.
+     */
+    void clearNativeShape();
+
 private:
     std::string filePath_;
     std::string displayName_;
     ShapeLoadStatus loadStatus_ = ShapeLoadStatus::NotLoaded;
     std::string errorMessage_;
     ShapeStatistics statistics_;
+    std::shared_ptr<void> nativeShape_;
+    std::string nativeShapeType_;
 };
 
 } // namespace osi::core

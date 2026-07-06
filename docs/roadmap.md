@@ -12,6 +12,7 @@
 - Add STEP/BREP loading in `osi::io`.
 - Keep loader independent from Qt, GUI, and viewer code.
 - Preserve configure behavior when OCCT is unavailable.
+- Collect first real topology statistics for CLI reports.
 
 ## Phase 2: Topology Statistics
 

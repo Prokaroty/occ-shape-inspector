@@ -1,5 +1,7 @@
 #include "osi/analyzer/ShapeAnalyzer.h"
 
+#include "osi/analyzer/ShapeStatisticsCollector.h"
+
 namespace osi::analyzer {
 
 bool ShapeAnalyzerOptions::enableBasicChecks() const
@@ -46,8 +48,24 @@ osi::report::ShapeReport ShapeAnalyzer::analyze(const osi::core::ShapeDocument& 
     if (document.loadStatus() == osi::core::ShapeLoadStatus::Failed) {
         report.setSuccess(false);
         report.setErrorMessage(document.errorMessage());
+        return report;
     }
 
+    if (document.loadStatus() != osi::core::ShapeLoadStatus::Loaded) {
+        report.setSuccess(false);
+        report.setErrorMessage("Document is not loaded.");
+        return report;
+    }
+
+    ShapeStatisticsCollector collector;
+    const ShapeStatisticsResult statisticsResult = collector.collect(document);
+    if (!statisticsResult.success()) {
+        report.setSuccess(false);
+        report.setErrorMessage(statisticsResult.message());
+        return report;
+    }
+
+    report.setStatistics(statisticsResult.statistics());
     return report;
 }
 

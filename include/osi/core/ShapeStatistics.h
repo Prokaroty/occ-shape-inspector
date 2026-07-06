@@ -32,6 +32,16 @@ public:
     void setCompoundCount(int count);
 
     /**
+     * @brief Returns the number of compsolids.
+     */
+    int compSolidCount() const;
+
+    /**
+     * @brief Sets the number of compsolids.
+     */
+    void setCompSolidCount(int count);
+
+    /**
      * @brief Returns the number of solids.
      */
     int solidCount() const;
@@ -123,6 +133,7 @@ public:
 
 private:
     int compoundCount_ = 0;
+    int compSolidCount_ = 0;
     int solidCount_ = 0;
     int shellCount_ = 0;
     int faceCount_ = 0;

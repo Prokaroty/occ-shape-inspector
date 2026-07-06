@@ -66,6 +66,7 @@ std::string ShapeReport::summary() const
         stream << "Error: " << errorMessage_ << '\n';
     }
     stream << "Topology: compounds=" << statistics_.compoundCount()
+           << ", compsolids=" << statistics_.compSolidCount()
            << ", solids=" << statistics_.solidCount() << ", shells=" << statistics_.shellCount()
            << ", faces=" << statistics_.faceCount() << ", wires=" << statistics_.wireCount()
            << ", edges=" << statistics_.edgeCount()

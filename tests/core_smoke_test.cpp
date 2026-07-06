@@ -29,9 +29,14 @@ int main()
 
     osi::core::ShapeStatistics statistics;
     require(statistics.compoundCount() == 0, "ShapeStatistics compound count should default to 0");
+    require(statistics.compSolidCount() == 0,
+            "ShapeStatistics compsolid count should default to 0");
     require(statistics.solidCount() == 0, "ShapeStatistics solid count should default to 0");
     require(!statistics.hasValidBoundingBox(),
             "ShapeStatistics bounding box should default to invalid");
+
+    statistics.setCompSolidCount(2);
+    statistics.setFaceCount(12);
 
     osi::report::ShapeReport report;
     report.setStatistics(statistics);
@@ -41,6 +46,9 @@ int main()
         osi::core::IssueLocation("/shape/0", -1, 3, -1, osi::core::IssueLocationKind::Edge)));
 
     require(report.issues().size() == 1, "ShapeReport should store added issues");
+    require(report.statistics().compSolidCount() == 2,
+            "ShapeReport should store supplied statistics");
+    require(report.statistics().faceCount() == 12, "ShapeReport should store face count");
     require(report.summary().find("Issues: 1") != std::string::npos,
             "ShapeReport summary should include issue count");
 

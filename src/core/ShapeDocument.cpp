@@ -66,4 +66,31 @@ void ShapeDocument::setStatistics(ShapeStatistics statistics)
     statistics_ = statistics;
 }
 
+bool ShapeDocument::hasNativeShape() const
+{
+    return static_cast<bool>(nativeShape_);
+}
+
+const std::string& ShapeDocument::nativeShapeType() const
+{
+    return nativeShapeType_;
+}
+
+std::shared_ptr<const void> ShapeDocument::nativeShape() const
+{
+    return nativeShape_;
+}
+
+void ShapeDocument::setNativeShape(std::shared_ptr<void> nativeShape, std::string nativeShapeType)
+{
+    nativeShape_ = std::move(nativeShape);
+    nativeShapeType_ = std::move(nativeShapeType);
+}
+
+void ShapeDocument::clearNativeShape()
+{
+    nativeShape_.reset();
+    nativeShapeType_.clear();
+}
+
 } // namespace osi::core

@@ -24,14 +24,45 @@ if(OSI_WITH_OCCT)
   find_package(OpenCASCADE QUIET)
   if(OpenCASCADE_FOUND)
     set(OSI_HAS_OCCT ON)
-    message(STATUS "Open CASCADE found; OCCT-backed loaders can be enabled later.")
+    message(STATUS "Open CASCADE found; OCCT-backed loaders and statistics are enabled.")
   else()
     message(
       STATUS
-        "Open CASCADE was requested but not found. Phase 0 will build without real CAD loading."
+        "Open CASCADE was requested but not found. Building with OCCT-backed loading disabled."
     )
   endif()
 endif()
+
+function(osi_target_link_occt target_name)
+  if(NOT OSI_HAS_OCCT)
+    return()
+  endif()
+
+  if(OpenCASCADE_INCLUDE_DIR)
+    target_include_directories(${target_name} PRIVATE ${OpenCASCADE_INCLUDE_DIR})
+  elseif(OpenCASCADE_INCLUDE_DIRS)
+    target_include_directories(${target_name} PRIVATE ${OpenCASCADE_INCLUDE_DIRS})
+  endif()
+
+  if(OpenCASCADE_LIBRARIES)
+    target_link_libraries(${target_name} PRIVATE ${OpenCASCADE_LIBRARIES})
+  else()
+    target_link_libraries(
+      ${target_name}
+      PRIVATE
+        TKernel
+        TKMath
+        TKBRep
+        TKTopAlgo
+        TKGeomBase
+        TKGeomAlgo
+        TKXSBase
+        TKSTEPBase
+        TKSTEPAttr
+        TKSTEP209
+        TKSTEP)
+  endif()
+endfunction()
 
 set(OSI_HAS_QT OFF)
 if(OSI_WITH_QT)
@@ -73,7 +104,20 @@ target_include_directories(
 target_link_libraries(osi_report PUBLIC osi::core)
 target_compile_features(osi_report PUBLIC cxx_std_17)
 
-add_library(osi_analyzer src/analyzer/ShapeAnalyzer.cpp)
+add_library(osi_io src/io/ShapeLoader.cpp)
+add_library(osi::io ALIAS osi_io)
+target_include_directories(
+  osi_io
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+target_link_libraries(osi_io PUBLIC osi::core)
+target_compile_features(osi_io PUBLIC cxx_std_17)
+osi_target_link_occt(osi_io)
+
+add_library(osi_analyzer
+  src/analyzer/ShapeAnalyzer.cpp
+  src/analyzer/ShapeStatisticsCollector.cpp)
 add_library(osi::analyzer ALIAS osi_analyzer)
 target_include_directories(
   osi_analyzer
@@ -82,10 +126,11 @@ target_include_directories(
     $<INSTALL_INTERFACE:include>)
 target_link_libraries(osi_analyzer PUBLIC osi::core osi::report)
 target_compile_features(osi_analyzer PUBLIC cxx_std_17)
+osi_target_link_occt(osi_analyzer)
 
 if(OSI_BUILD_CLI)
   add_executable(osi-inspect app/cli/main.cpp)
-  target_link_libraries(osi-inspect PRIVATE osi::analyzer osi::report osi::core)
+  target_link_libraries(osi-inspect PRIVATE osi::io osi::analyzer osi::report osi::core)
   target_compile_features(osi-inspect PRIVATE cxx_std_17)
 endif()
 
@@ -99,4 +144,9 @@ if(OSI_BUILD_TESTS)
   target_link_libraries(osi_core_smoke_tests PRIVATE osi::core osi::report)
   target_compile_features(osi_core_smoke_tests PRIVATE cxx_std_17)
   add_test(NAME osi_core_smoke_tests COMMAND osi_core_smoke_tests)
+
+  add_executable(osi_io_loader_tests tests/io_loader_test.cpp)
+  target_link_libraries(osi_io_loader_tests PRIVATE osi::io)
+  target_compile_features(osi_io_loader_tests PRIVATE cxx_std_17)
+  add_test(NAME osi_io_loader_tests COMMAND osi_io_loader_tests)
 endif()

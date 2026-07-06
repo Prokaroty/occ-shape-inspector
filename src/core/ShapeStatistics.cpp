@@ -14,6 +14,16 @@ void ShapeStatistics::setCompoundCount(int count)
     compoundCount_ = count;
 }
 
+int ShapeStatistics::compSolidCount() const
+{
+    return compSolidCount_;
+}
+
+void ShapeStatistics::setCompSolidCount(int count)
+{
+    compSolidCount_ = count;
+}
+
 int ShapeStatistics::solidCount() const
 {
     return solidCount_;

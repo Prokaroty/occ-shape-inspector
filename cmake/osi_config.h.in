@@ -1,0 +1,4 @@
+#pragma once
+
+#cmakedefine01 OSI_HAS_OCCT
+#cmakedefine01 OSI_HAS_QT

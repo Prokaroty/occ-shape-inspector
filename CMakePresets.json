@@ -1,0 +1,50 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default",
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": {
+        "OSI_BUILD_CLI": "ON",
+        "OSI_BUILD_GUI": "OFF",
+        "OSI_BUILD_TESTS": "ON",
+        "OSI_WITH_OCCT": "ON"
+      }
+    },
+    {
+      "name": "no-occt",
+      "displayName": "No OCCT",
+      "binaryDir": "${sourceDir}/build/no-occt",
+      "cacheVariables": {
+        "OSI_WITH_OCCT": "OFF",
+        "OSI_BUILD_GUI": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "no-occt",
+      "configurePreset": "no-occt"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

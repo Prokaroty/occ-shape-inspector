@@ -11,7 +11,8 @@ later phases.
 - C++17 CMake project skeleton.
 - `osi::core` data structures for documents, issues, locations, and statistics.
 - `osi::io` OCCT-backed loader for STEP and BREP files when Open CASCADE is found.
-- `osi::analyzer` topology statistics collection for loaded OCCT shapes.
+- `osi::analyzer` topology statistics collection and first-pass issue detection for
+  loaded OCCT shapes.
 - `osi::report` API for storing statistics and shape issues.
 - `osi-inspect` CLI with `--help` and real statistics output when OCCT is enabled.
 - Smoke tests without external test frameworks.
@@ -45,6 +46,19 @@ message. In that case the CLI builds, but loading a supported CAD file reports t
 OCCT support is disabled. Use `-DOSI_WITH_OCCT=OFF` or the `no-occt` preset to test
 that path explicitly.
 
+For OCCT combined prebuilt packages, pass the OCCT package config directory and,
+when needed, the sibling third-party root:
+
+```bat
+cmake --preset default --fresh ^
+  -DOpenCASCADE_DIR="<path-to-occt>/cmake" ^
+  -DOSI_OCCT_THIRDPARTY_DIR="<path-to-occt-combined>/3rdparty-vc14-64"
+```
+
+The CLI phase links only OCCT modeling/data-exchange toolkits. Visualization
+toolkits such as AIS, V3d, OpenGL, Draw, and ViewerTest are intentionally left for
+future optional GUI/Viewer targets.
+
 ## CLI
 
 ```sh
@@ -75,6 +89,13 @@ Bounding box:
 Issues: 0
 ```
 
-The current phase does not implement Qt GUI, viewer highlighting, repair logic, or
-issue detection. Issue lists are expected to remain empty until the basic analyzer
-checks are added in a later phase.
+Current issue checks:
+
+- `InvalidShape`
+- `FreeEdge`
+- `SmallEdge`
+- `SmallFace`
+- `DegeneratedEdge`
+
+The current phase does not implement Qt GUI, viewer highlighting, repair logic, JSON
+reports, or automatic repair. Issue thresholds use the model's native units.

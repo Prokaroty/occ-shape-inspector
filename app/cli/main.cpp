@@ -1,6 +1,7 @@
 #include "osi/analyzer/ShapeAnalyzer.h"
 #include "osi/core/ShapeDocument.h"
 #include "osi/io/ShapeLoader.h"
+#include "osi/report/ShapeReport.h"
 
 #include <iomanip>
 #include <iostream>
@@ -43,6 +44,20 @@ void printStatistics(const osi::core::ShapeStatistics& statistics)
     std::cout << "  Max: " << max.x << ", " << max.y << ", " << max.z << "\n\n";
 }
 
+void printIssues(const osi::report::ShapeReport& report)
+{
+    std::cout << "Issues: " << report.issues().size() << '\n';
+    for (const osi::core::ShapeIssue& issue : report.issues()) {
+        std::cout << "\n[" << osi::core::toString(issue.severity()) << "] "
+                  << osi::core::toString(issue.type()) << '\n';
+        std::cout << "  Location: "
+                  << (issue.shapePath().empty() ? osi::core::toString(issue.location().kind())
+                                                : issue.shapePath())
+                  << '\n';
+        std::cout << "  Message: " << issue.message() << '\n';
+    }
+}
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -81,6 +96,6 @@ int main(int argc, char** argv)
     }
 
     printStatistics(report.statistics());
-    std::cout << "Issues: " << report.issues().size() << '\n';
+    printIssues(report);
     return report.success() ? 0 : 2;
 }

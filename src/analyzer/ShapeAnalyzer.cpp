@@ -1,6 +1,9 @@
 #include "osi/analyzer/ShapeAnalyzer.h"
 
+#include "osi/analyzer/ShapeIssueDetector.h"
 #include "osi/analyzer/ShapeStatisticsCollector.h"
+
+#include <utility>
 
 namespace osi::analyzer {
 
@@ -12,6 +15,56 @@ bool ShapeAnalyzerOptions::enableBasicChecks() const
 void ShapeAnalyzerOptions::setEnableBasicChecks(bool enabled)
 {
     enableBasicChecks_ = enabled;
+}
+
+bool ShapeAnalyzerOptions::enableInvalidShapeCheck() const
+{
+    return enableBasicChecks_ && enableInvalidShapeCheck_;
+}
+
+void ShapeAnalyzerOptions::setEnableInvalidShapeCheck(bool enabled)
+{
+    enableInvalidShapeCheck_ = enabled;
+}
+
+bool ShapeAnalyzerOptions::enableFreeEdgeCheck() const
+{
+    return enableBasicChecks_ && enableFreeEdgeCheck_;
+}
+
+void ShapeAnalyzerOptions::setEnableFreeEdgeCheck(bool enabled)
+{
+    enableFreeEdgeCheck_ = enabled;
+}
+
+bool ShapeAnalyzerOptions::enableSmallEdgeCheck() const
+{
+    return enableBasicChecks_ && enableSmallEdgeCheck_;
+}
+
+void ShapeAnalyzerOptions::setEnableSmallEdgeCheck(bool enabled)
+{
+    enableSmallEdgeCheck_ = enabled;
+}
+
+bool ShapeAnalyzerOptions::enableSmallFaceCheck() const
+{
+    return enableBasicChecks_ && enableSmallFaceCheck_;
+}
+
+void ShapeAnalyzerOptions::setEnableSmallFaceCheck(bool enabled)
+{
+    enableSmallFaceCheck_ = enabled;
+}
+
+bool ShapeAnalyzerOptions::enableDegeneratedEdgeCheck() const
+{
+    return enableBasicChecks_ && enableDegeneratedEdgeCheck_;
+}
+
+void ShapeAnalyzerOptions::setEnableDegeneratedEdgeCheck(bool enabled)
+{
+    enableDegeneratedEdgeCheck_ = enabled;
 }
 
 double ShapeAnalyzerOptions::smallEdgeLengthThreshold() const
@@ -39,8 +92,6 @@ ShapeAnalyzer::ShapeAnalyzer() = default;
 osi::report::ShapeReport ShapeAnalyzer::analyze(const osi::core::ShapeDocument& document,
                                                 const ShapeAnalyzerOptions& options) const
 {
-    (void)options;
-
     osi::report::ShapeReport report;
     report.setSourceFilePath(document.filePath());
     report.setStatistics(document.statistics());
@@ -66,6 +117,10 @@ osi::report::ShapeReport ShapeAnalyzer::analyze(const osi::core::ShapeDocument& 
     }
 
     report.setStatistics(statisticsResult.statistics());
+    ShapeIssueDetector issueDetector;
+    for (auto issue : issueDetector.detect(document, options)) {
+        report.addIssue(std::move(issue));
+    }
     return report;
 }
 

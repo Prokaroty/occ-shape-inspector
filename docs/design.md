@@ -24,9 +24,11 @@ the future `cad-repair-lab` project without pulling in GUI or viewer dependencie
 
 1. A model file is loaded into a `ShapeDocument`.
 2. `ShapeAnalyzer` analyzes the document with `ShapeAnalyzerOptions`.
-3. The analyzer returns a `ShapeReport`.
-4. CLI output, report exporters, and future GUI panels read `ShapeReport`.
-5. The future viewer receives only display/highlight requests derived from
+3. `ShapeStatisticsCollector` records topology counts and bounding box.
+4. `ShapeIssueDetector` produces a vector of `ShapeIssue`.
+5. The analyzer returns a `ShapeReport`.
+6. CLI output, report exporters, and future GUI panels read `ShapeReport`.
+7. The future viewer receives only display/highlight requests derived from
    `ShapeIssue` and `IssueLocation`.
 
 The analyzer does not depend on Qt. The analyzer does not depend on the viewer.
@@ -43,6 +45,12 @@ OCCT dependencies are target-scoped:
   statistics.
 - `osi::core`, `osi::report`, and the CLI public surface do not expose Qt or viewer
   dependencies.
+
+The CLI phase links only OCCT modeling and data-exchange toolkits needed for file
+loading, topology traversal, geometric properties, and shape checks. It deliberately
+does not link OCCT visualization toolkits such as AIS, V3d, OpenGL, Draw, or viewer
+test libraries. GUI/Viewer phases will introduce AIS/V3d/OpenGL dependencies through
+separate optional targets.
 
 `ShapeDocument` uses a small type-erased native handle for the loaded CAD shape. The
 public core header stores `std::shared_ptr<void>` plus a native type string such as
@@ -62,8 +70,14 @@ code can pass a selected `ShapeIssue` to the viewer, and the viewer can map the 
 location back to a displayed OCCT sub-shape for highlighting. The analyzer still owns
 the decision that an issue exists; the viewer only displays and highlights.
 
+The issue list is not a Qt model and is not viewer state. It is plain analyzer output:
+`ShapeIssue` carries type, severity, message, and `IssueLocation`. A future GUI should
+display these objects directly or adapt them at the boundary, while a future viewer
+should use `IssueLocation` only to locate and highlight the relevant sub-shape.
+
 ## Phase 0 Constraints
 
-Phase 1 implements OCCT-backed STEP/BREP loading and topology statistics. It still
-does not implement full GUI, AIS viewer integration, repair logic, or basic issue
-detection such as free-edge or small-face checks.
+Phase 2 adds a first-pass `ShapeIssueDetector` for invalid shapes, free edges, small
+edges, small faces, and degenerated edges. It still does not implement full GUI, AIS
+viewer integration, repair logic, or automatic fixes. Repair is outside the current
+inspector phase.

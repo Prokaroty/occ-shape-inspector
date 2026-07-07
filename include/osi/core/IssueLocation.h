@@ -9,6 +9,7 @@ namespace osi::core {
  */
 enum class IssueLocationKind {
     Unknown,
+    Global,
     Shape,
     Compound,
     Solid,
@@ -18,6 +19,11 @@ enum class IssueLocationKind {
     Edge,
     Vertex
 };
+
+/**
+ * @brief Converts an issue location kind into a stable English identifier.
+ */
+std::string toString(IssueLocationKind kind);
 
 /**
  * @brief Lightweight issue location that is independent from OCCT, Qt, and viewer code.

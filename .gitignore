@@ -67,3 +67,10 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Local CAD models for manual verification only
+tests/models/*.step
+tests/models/*.stp
+tests/models/*.brep
+tests/models/*.rle
+!tests/models/README.md

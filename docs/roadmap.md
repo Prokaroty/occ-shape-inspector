@@ -23,6 +23,8 @@
 
 - Detect invalid shapes, free edges, small edges, small faces, degenerated edges,
   open wires, and non-manifold edges in `osi::analyzer`.
+- Current detector work starts with invalid shapes, free edges, small edges, small
+  faces, and degenerated edges. Open wires and non-manifold edges remain future work.
 
 ## Phase 4: Qt GUI Skeleton
 

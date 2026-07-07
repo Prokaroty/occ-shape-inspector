@@ -4,6 +4,33 @@
 
 namespace osi::core {
 
+std::string toString(IssueLocationKind kind)
+{
+    switch (kind) {
+    case IssueLocationKind::Global:
+        return "Global";
+    case IssueLocationKind::Shape:
+        return "Shape";
+    case IssueLocationKind::Compound:
+        return "Compound";
+    case IssueLocationKind::Solid:
+        return "Solid";
+    case IssueLocationKind::Shell:
+        return "Shell";
+    case IssueLocationKind::Face:
+        return "Face";
+    case IssueLocationKind::Wire:
+        return "Wire";
+    case IssueLocationKind::Edge:
+        return "Edge";
+    case IssueLocationKind::Vertex:
+        return "Vertex";
+    case IssueLocationKind::Unknown:
+    default:
+        return "Unknown";
+    }
+}
+
 IssueLocation::IssueLocation() = default;
 
 IssueLocation::IssueLocation(std::string shapePath, int faceIndex, int edgeIndex, int vertexIndex,
